@@ -1,0 +1,200 @@
+Metadata-Version: 2.4
+Name: scanpy
+Version: 1.11.5
+Summary: Single-Cell Analysis in Python.
+Project-URL: Documentation, https://scanpy.readthedocs.io/
+Project-URL: Source, https://github.com/scverse/scanpy
+Project-URL: Homepage, https://scanpy.org
+Project-URL: Discourse, https://discourse.scverse.org/c/help/scanpy/37
+Project-URL: Bluesky, https://bsky.app/profile/scverse.bsky.social
+Project-URL: Twitter, https://x.com/scverse_team
+Author: Alex Wolf, Philipp Angerer, Fidel Ramirez, Isaac Virshup, Sergei Rybakov, Gokcen Eraslan, Tom White, Malte Luecken, Davide Cittaro, Tobias Callies, Marius Lange, Andrés R. Muñoz-Rojas
+Maintainer: Severin Dicks
+Maintainer-email: Philipp Angerer <phil.angerer@gmail.com>, Ilan Gold <ilan.gold@helmholtz-munich.de>
+License-Expression: BSD-3-Clause
+License-File: LICENSE
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Environment :: Console
+Classifier: Framework :: Jupyter
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Natural Language :: English
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Bio-Informatics
+Classifier: Topic :: Scientific/Engineering :: Visualization
+Requires-Python: >=3.10
+Requires-Dist: anndata>=0.8
+Requires-Dist: h5py>=3.7.0
+Requires-Dist: joblib
+Requires-Dist: legacy-api-wrap>=1.4.1
+Requires-Dist: matplotlib>=3.7.5
+Requires-Dist: natsort
+Requires-Dist: networkx>=2.7.1
+Requires-Dist: numba!=0.62.0rc1,>=0.57.1
+Requires-Dist: numpy>=1.24.1
+Requires-Dist: packaging>=21.3
+Requires-Dist: pandas>=1.5.3
+Requires-Dist: patsy!=1.0.0
+Requires-Dist: pynndescent>=0.5.13
+Requires-Dist: scikit-learn>=1.1.3
+Requires-Dist: scipy>=1.8.1
+Requires-Dist: seaborn>=0.13.2
+Requires-Dist: session-info2
+Requires-Dist: statsmodels>=0.14.5
+Requires-Dist: tqdm
+Requires-Dist: typing-extensions; python_version < '3.13'
+Requires-Dist: umap-learn>=0.5.6
+Provides-Extra: bbknn
+Requires-Dist: bbknn; extra == 'bbknn'
+Provides-Extra: dask
+Requires-Dist: anndata[dask]; extra == 'dask'
+Requires-Dist: dask[array]>=2022.09.2; extra == 'dask'
+Provides-Extra: dask-ml
+Requires-Dist: anndata[dask]; extra == 'dask-ml'
+Requires-Dist: dask-ml; extra == 'dask-ml'
+Requires-Dist: dask[array]>=2022.09.2; extra == 'dask-ml'
+Provides-Extra: dev
+Requires-Dist: scipy-stubs; extra == 'dev'
+Requires-Dist: towncrier; extra == 'dev'
+Provides-Extra: doc
+Requires-Dist: anndata[dask]; extra == 'doc'
+Requires-Dist: dask-ml; extra == 'doc'
+Requires-Dist: dask[array]>=2022.09.2; extra == 'doc'
+Requires-Dist: igraph; extra == 'doc'
+Requires-Dist: igraph>=0.10.8; extra == 'doc'
+Requires-Dist: ipython>=7.20; extra == 'doc'
+Requires-Dist: leidenalg>=0.9.0; extra == 'doc'
+Requires-Dist: myst-nb>=1; extra == 'doc'
+Requires-Dist: myst-parser>=2; extra == 'doc'
+Requires-Dist: nbsphinx>=0.9; extra == 'doc'
+Requires-Dist: sam-algorithm; extra == 'doc'
+Requires-Dist: scanpydoc>=0.15.3; extra == 'doc'
+Requires-Dist: sphinx-autodoc-typehints>=1.25.2; extra == 'doc'
+Requires-Dist: sphinx-book-theme>=1.1.0; extra == 'doc'
+Requires-Dist: sphinx-copybutton; extra == 'doc'
+Requires-Dist: sphinx-design; extra == 'doc'
+Requires-Dist: sphinx-issues>=5.0.1; extra == 'doc'
+Requires-Dist: sphinx-tabs; extra == 'doc'
+Requires-Dist: sphinx>=8.2.3; extra == 'doc'
+Requires-Dist: sphinxcontrib-bibtex; extra == 'doc'
+Requires-Dist: sphinxext-opengraph; extra == 'doc'
+Provides-Extra: harmony
+Requires-Dist: harmonypy; extra == 'harmony'
+Provides-Extra: leiden
+Requires-Dist: igraph>=0.10.8; extra == 'leiden'
+Requires-Dist: leidenalg>=0.9.0; extra == 'leiden'
+Provides-Extra: louvain
+Requires-Dist: igraph; extra == 'louvain'
+Requires-Dist: louvain>=0.8.2; extra == 'louvain'
+Requires-Dist: setuptools<81; extra == 'louvain'
+Provides-Extra: magic
+Requires-Dist: magic-impute>=2.0.4; extra == 'magic'
+Provides-Extra: paga
+Requires-Dist: igraph; extra == 'paga'
+Provides-Extra: rapids
+Requires-Dist: cudf>=0.9; extra == 'rapids'
+Requires-Dist: cugraph>=0.9; extra == 'rapids'
+Requires-Dist: cuml>=0.9; extra == 'rapids'
+Provides-Extra: scanorama
+Requires-Dist: scanorama; extra == 'scanorama'
+Provides-Extra: scrublet
+Requires-Dist: scikit-image; extra == 'scrublet'
+Provides-Extra: skmisc
+Requires-Dist: scikit-misc>=0.1.4; extra == 'skmisc'
+Provides-Extra: test
+Requires-Dist: anndata[dask]; extra == 'test'
+Requires-Dist: dask-ml; extra == 'test'
+Requires-Dist: dask[array]>=2022.09.2; extra == 'test'
+Requires-Dist: igraph; extra == 'test'
+Requires-Dist: igraph>=0.10.8; extra == 'test'
+Requires-Dist: leidenalg>=0.9.0; extra == 'test'
+Requires-Dist: louvain>=0.8.2; extra == 'test'
+Requires-Dist: pytest-cov; extra == 'test'
+Requires-Dist: pytest-mock; extra == 'test'
+Requires-Dist: pytest-randomly; extra == 'test'
+Requires-Dist: pytest-rerunfailures; extra == 'test'
+Requires-Dist: pytest-xdist[psutil]; extra == 'test'
+Requires-Dist: pytest>=8.2.2; extra == 'test'
+Requires-Dist: scikit-image; extra == 'test'
+Requires-Dist: scikit-misc>=0.1.4; extra == 'test'
+Requires-Dist: setuptools<81; extra == 'test'
+Requires-Dist: tuna; extra == 'test'
+Requires-Dist: zarr<3; extra == 'test'
+Provides-Extra: test-min
+Requires-Dist: pytest-cov; extra == 'test-min'
+Requires-Dist: pytest-mock; extra == 'test-min'
+Requires-Dist: pytest-randomly; extra == 'test-min'
+Requires-Dist: pytest-rerunfailures; extra == 'test-min'
+Requires-Dist: pytest-xdist[psutil]; extra == 'test-min'
+Requires-Dist: pytest>=8.2.2; extra == 'test-min'
+Requires-Dist: tuna; extra == 'test-min'
+Description-Content-Type: text/markdown
+
+[![Stars](https://img.shields.io/github/stars/scverse/scanpy?style=flat&logo=GitHub&color=yellow)](https://github.com/scverse/scanpy/stargazers)
+[![PyPI](https://img.shields.io/pypi/v/scanpy)](https://pypi.org/project/scanpy)
+[![PyPI Downloads](https://img.shields.io/pepy/dt/scanpy?logo=pypi)](https://pepy.tech/project/scanpy)
+[![Conda Forge](https://img.shields.io/conda/vn/conda-forge/scanpy)
+![Conda Forge Downloads](https://img.shields.io/conda/dn/conda-forge/scanpy?logo=condaforge)](https://anaconda.org/conda-forge/scanpy)
+[![Docs](https://readthedocs.com/projects/icb-scanpy/badge/?version=latest)](https://scanpy.readthedocs.io)
+[![CI](https://github.com/scverse/scanpy/actions/workflows/ci.yml/badge.svg)](https://github.com/scverse/scanpy/actions/workflows/ci.yml)
+[![Discourse topics](https://img.shields.io/discourse/posts?color=yellow&logo=discourse&server=https%3A%2F%2Fdiscourse.scverse.org)](https://discourse.scverse.org/)
+[![Chat](https://img.shields.io/badge/zulip-join_chat-%2367b08f.svg)](https://scverse.zulipchat.com)
+[![Powered by NumFOCUS](https://img.shields.io/badge/powered%20by-NumFOCUS-orange.svg?style=flat&colorA=E1523D&colorB=007D8A)](https://numfocus.org/)
+
+# Scanpy – Single-Cell Analysis in Python
+
+Scanpy is a scalable toolkit for analyzing single-cell gene expression data
+built jointly with [anndata][].  It includes
+preprocessing, visualization, clustering, trajectory inference and differential
+expression testing.  The Python-based implementation efficiently deals with
+datasets of more than one million cells.
+
+Discuss usage on the scverse [Discourse][]. Read the [documentation][].
+If you'd like to contribute by opening an issue or creating a pull request, please take a look at our [contribution guide][].
+
+[anndata]: https://anndata.readthedocs.io
+[discourse]: https://discourse.scverse.org/
+[documentation]: https://scanpy.readthedocs.io
+
+[//]: # (numfocus-fiscal-sponsor-attribution)
+
+scanpy is part of the scverse project ([website](https://scverse.org), [governance](https://scverse.org/about/roles)) and is fiscally sponsored by [NumFOCUS](https://numfocus.org/).
+If you like scverse and want to support our mission, please consider making a [donation](https://numfocus.org/donate-to-scverse) to support our efforts.
+
+<div align="center">
+<a href="https://numfocus.org/project/scverse">
+  <img
+    src="https://raw.githubusercontent.com/numfocus/templates/master/images/numfocus-logo.png"
+    width="200"
+  >
+</a>
+</div>
+
+
+## Citation
+
+If you use `scanpy` in your work, please cite the `scanpy` publication as follows:
+
+> **SCANPY: large-scale single-cell gene expression data analysis**
+>
+> F. Alexander Wolf, Philipp Angerer, Fabian J. Theis
+>
+> _Genome Biology_ 2018 Feb 06. doi: [10.1186/s13059-017-1382-0](https://doi.org/10.1186/s13059-017-1382-0).
+
+You can cite the scverse publication as follows:
+
+> **The scverse project provides a computational ecosystem for single-cell omics data analysis**
+>
+> Isaac Virshup, Danila Bredikhin, Lukas Heumos, Giovanni Palla, Gregor Sturm, Adam Gayoso, Ilia Kats, Mikaela Koutrouli, Scverse Community, Bonnie Berger, Dana Pe’er, Aviv Regev, Sarah A. Teichmann, Francesca Finotello, F. Alexander Wolf, Nir Yosef, Oliver Stegle & Fabian J. Theis
+>
+> _Nat Biotechnol._ 2023 Apr 10. doi: [10.1038/s41587-023-01733-8](https://doi.org/10.1038/s41587-023-01733-8).
+
+
+[contribution guide]: CONTRIBUTING.md
