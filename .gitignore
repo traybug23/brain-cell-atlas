@@ -154,3 +154,11 @@ temp/
 
 *.tmp
 
+# Ignore the backup directory
+.git-backup/
+
+# Other common things to ignore
+*.log
+node_modules/
+.env
+.DS_Store
