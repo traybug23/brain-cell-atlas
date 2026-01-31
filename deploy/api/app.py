@@ -78,8 +78,8 @@ async def lifespan(app: FastAPI):
         # GOOGLE DRIVE CONFIGURATION
         # Replace these IDs with your actual Google Drive File IDs
         # ------------------------------------------------------------------
-        DATA_FILE_ID = "data/human_mtg_brain_atlas_final.h5ad"
-        MODEL_FILE_ID = "/mnt/c/Users/sneha/BrainCellAtlas/results/models/cell_type_classifier.pkl"
+        DATA_FILE_ID = "130ZSfK0ebKHKIXtFy4DWvh47QLObZrpE"
+        MODEL_FILE_ID = "1jl7NnprnG31kAcp_y4aogCjZx-0WvEpV"
         # ------------------------------------------------------------------
         
         # Local cache directory (ephemeral on Render)
