@@ -23,149 +23,41 @@ Endpoints:
 """
 
 import logging
-from contextlib import asynccontextmanager
-from typing import Dict, List, Optional
+import requests
+from pathlib import Path
+import os
 
-import numpy as np
-import pandas as pd
-import scanpy as sc
-import joblib
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
-
-# Global resources (loaded at startup)
-adata = None
-model = None
-gene_set = None
-
-# =============================================================================
-# Constants
-# =============================================================================
-
-CLUSTER_ANNOTATIONS = {
-    '0': 'Excitatory Neurons L2/3',
-    '1': 'Excitatory Neurons L5/6',
-    '2': 'Inhibitory Neurons',
-    '3': 'Astrocytes',
-    '4': 'Oligodendrocytes',
-    '5': 'OPCs',
-    '6': 'Microglia',
-    '7': 'Endothelial cells'
-}
-
-LANGUAGE_GENES = [
-    'KIAA0226L', 'KIAA1033', 'KIAA1147', 'KIAA1551',
-    'KIAA1598', 'KIAA1755', 'ROBO1', 'ROBO2'
-]
-
-CANONICAL_MARKERS = {
-    'Excitatory Neurons L2/3': ['SLC17A7', 'CAMK2A', 'SATB2'],
-    'Excitatory Neurons L5/6': ['SLC17A7', 'FEZF2', 'BCL11B'],
-    'Inhibitory Neurons': ['GAD1', 'GAD2', 'PVALB', 'SST', 'VIP'],
-    'Astrocytes': ['GFAP', 'AQP4', 'SLC1A3', 'ALDH1L1'],
-    'Oligodendrocytes': ['MBP', 'PLP1', 'MOG', 'OLIG2'],
-    'OPCs': ['PDGFRA', 'CSPG4', 'OLIG1'],
-    'Microglia': ['CX3CR1', 'P2RY12', 'CSF1R', 'AIF1'],
-    'Endothelial cells': ['CLDN5', 'PECAM1', 'VWF']
-}
-
-# Pre-computed model metrics - DO NOT RECALCULATE
-CLASS_METRICS = {
-    'Astrocytes': {'precision': 0.99, 'recall': 0.99, 'f1': 0.99, 'support': 183},
-    'Endothelial cells': {'precision': 0.99, 'recall': 0.87, 'f1': 0.93, 'support': 111},
-    'Excitatory Neurons L2/3': {'precision': 0.98, 'recall': 0.99, 'f1': 0.99, 'support': 299},
-    'Excitatory Neurons L5/6': {'precision': 0.97, 'recall': 1.00, 'f1': 0.98, 'support': 273},
-    'Inhibitory Neurons': {'precision': 0.98, 'recall': 0.99, 'f1': 0.98, 'support': 203},
-    'Microglia': {'precision': 1.00, 'recall': 1.00, 'f1': 1.00, 'support': 117},
-    'OPCs': {'precision': 0.99, 'recall': 0.99, 'f1': 0.99, 'support': 140},
-    'Oligodendrocytes': {'precision': 0.99, 'recall': 1.00, 'f1': 1.00, 'support': 172}
-}
-
-CONFUSION_MATRIX = [
-    [181, 0, 1, 0, 0, 0, 1, 0],      # Astrocytes
-    [0, 97, 3, 7, 3, 0, 0, 1],       # Endothelial cells
-    [0, 0, 297, 0, 2, 0, 0, 0],      # Excitatory Neurons L2/3
-    [0, 0, 1, 272, 0, 0, 0, 0],      # Excitatory Neurons L5/6
-    [0, 1, 0, 1, 201, 0, 0, 0],      # Inhibitory Neurons
-    [0, 0, 0, 0, 0, 117, 0, 0],      # Microglia
-    [1, 0, 0, 0, 0, 0, 139, 0],      # OPCs
-    [0, 0, 0, 0, 0, 0, 0, 172]       # Oligodendrocytes
-]
-
-CLASS_ORDER = [
-    'Astrocytes', 'Endothelial cells', 'Excitatory Neurons L2/3',
-    'Excitatory Neurons L5/6', 'Inhibitory Neurons', 'Microglia',
-    'OPCs', 'Oligodendrocytes'
-]
-
-
-# =============================================================================
-# Pydantic Models
-# =============================================================================
-
-class HealthResponse(BaseModel):
-    """Health check response"""
-    status: str
-    n_cells: int
-    n_genes: int
-    cell_types: List[str]
-
-
-class GeneListResponse(BaseModel):
-    """Available genes response"""
-    genes: List[str]
-    total: int
-
-
-class CellTypeDistItem(BaseModel):
-    """Single cell type distribution item"""
-    cell_type: str
-    count: int
-    percentage: float
-
-
-class CellTypeDistResponse(BaseModel):
-    """Cell type distribution response"""
-    distribution: List[CellTypeDistItem]
-    total_cells: int
-
-
-class UMAPPoint(BaseModel):
-    """Single UMAP coordinate point"""
-    x: float
-    y: float
-    cell_type: str
-
-
-class GeneExpressionItem(BaseModel):
-    """Single gene expression item"""
-    cell_type: str
-    mean_expression: float
-
-
-class GeneExpressionResponse(BaseModel):
-    """Gene expression response"""
-    gene: str
-    expression: List[GeneExpressionItem]
-
-
-class PredictionResponse(BaseModel):
-    """Random cell prediction response"""
-    cell_index: int
-    true_label: str
-    predicted_label: str
-    confidence: float
-    top_3_predictions: Dict[str, float]
-    pca_features: List[float]
-
+def download_from_gdrive(file_id: str, destination: str):
+    """Download file from Google Drive if it doesn't exist locally."""
+    if os.path.exists(destination):
+        logger.info(f"✅ Using cached file: {destination}")
+        return
+    
+    logger.info(f"📥 Downloading from Google Drive to {destination}...")
+    
+    # Create directory if needed
+    os.makedirs(os.path.dirname(destination), exist_ok=True)
+    
+    # Google Drive direct download URL
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    
+    session = requests.Session()
+    response = session.get(url, stream=True)
+    
+    # Handle large file confirmation
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            params = {'id': file_id, 'confirm': value}
+            response = session.get(url, params=params, stream=True)
+            break
+    
+    # Save file
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(chunk_size=32768):
+            if chunk:
+                f.write(chunk)
+    
+    logger.info(f"✅ Download complete: {destination}")
 
 # =============================================================================
 # App Lifespan - Resource Management
@@ -175,21 +67,44 @@ class PredictionResponse(BaseModel):
 async def lifespan(app: FastAPI):
     """
     Load resources once at startup, clean up on shutdown.
+    Downloads large data files from Google Drive if needed.
     """
     global adata, model, gene_set
     
     logger.info("🚀 Starting Brain Cell Atlas API...")
     
     try:
-        # Load the final processed data file
-        data_path = "../../data/human_mtg_brain_atlas_final.h5ad"
-        logger.info(f"📂 Loading data from: {data_path}")
-        adata = sc.read_h5ad(data_path)
+        # ------------------------------------------------------------------
+        # GOOGLE DRIVE CONFIGURATION
+        # Replace these IDs with your actual Google Drive File IDs
+        # ------------------------------------------------------------------
+        DATA_FILE_ID = "data/human_mtg_brain_atlas_final.h5ad"
+        MODEL_FILE_ID = "/mnt/c/Users/sneha/BrainCellAtlas/results/models/cell_type_classifier.pkl"
+        # ------------------------------------------------------------------
         
-        # Load the trained classifier
-        model_path = "../../results/models/cell_type_classifier.pkl"
-        logger.info(f"🤖 Loading model from: {model_path}")
-        model = joblib.load(model_path)
+        # Local cache directory (ephemeral on Render)
+        cache_dir = Path("/tmp/brain_atlas_cache")
+        data_path = cache_dir / "human_mtg_brain_atlas_final.h5ad"
+        model_path = cache_dir / "cell_type_classifier.pkl"
+        
+        # Download files if they don't exist
+        # Only attempt download if IDs are set, otherwise fall back to local relative path
+        if "PUT_YOUR" not in DATA_FILE_ID:
+            download_from_gdrive(DATA_FILE_ID, str(data_path))
+            download_from_gdrive(MODEL_FILE_ID, str(model_path))
+            load_path_data = str(data_path)
+            load_path_model = str(model_path)
+        else:
+            # Fallback for local development if files are present
+            logger.warning("⚠️ Google Drive IDs not set. Checking local paths...")
+            load_path_data = "../../data/human_mtg_brain_atlas_final.h5ad"
+            load_path_model = "../../results/models/cell_type_classifier.pkl"
+
+        logger.info(f"📂 Loading data from: {load_path_data}")
+        adata = sc.read_h5ad(load_path_data)
+        
+        logger.info(f"🤖 Loading model from: {load_path_model}")
+        model = joblib.load(load_path_model)
         
         # Create fast lookup set for gene validation (O(1) search)
         gene_set = set(adata.var_names.str.upper())
