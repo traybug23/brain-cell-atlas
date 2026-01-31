@@ -13,3 +13,4 @@ pydantic==2.9.0
 python-multipart==0.0.17
 h5py==3.12.1
 requests>=2.32.0
+gdown>=5.1.0

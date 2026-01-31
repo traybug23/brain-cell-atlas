@@ -27,8 +27,10 @@ import requests
 from pathlib import Path
 import os
 
+import gdown
+
 def download_from_gdrive(file_id: str, destination: str):
-    """Download file from Google Drive if it doesn't exist locally."""
+    """Download file from Google Drive using gdown (handles large files/confirmations)."""
     if os.path.exists(destination):
         logger.info(f"✅ Using cached file: {destination}")
         return
@@ -38,26 +40,27 @@ def download_from_gdrive(file_id: str, destination: str):
     # Create directory if needed
     os.makedirs(os.path.dirname(destination), exist_ok=True)
     
-    # Google Drive direct download URL
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
-    
-    session = requests.Session()
-    response = session.get(url, stream=True)
-    
-    # Handle large file confirmation
-    for key, value in response.cookies.items():
-        if key.startswith('download_warning'):
-            params = {'id': file_id, 'confirm': value}
-            response = session.get(url, params=params, stream=True)
-            break
-    
-    # Save file
-    with open(destination, "wb") as f:
-        for chunk in response.iter_content(chunk_size=32768):
-            if chunk:
-                f.write(chunk)
-    
-    logger.info(f"✅ Download complete: {destination}")
+    # gdown provides robust handling for Google Drive links
+    try:
+        gdown.download(id=file_id, output=destination, quiet=False)
+        
+        # Verify file size is not zero
+        if os.path.getsize(destination) < 1000:
+            # Check if it's an HTML error page
+            with open(destination, 'rb') as f:
+                header = f.read(100)
+                if b'<!DOCTYPE html' in header or b'<html' in header:
+                    logger.error("❌ Download failed: Received HTML instead of binary file.")
+                    os.remove(destination)
+                    raise RuntimeError("Invalid file downloaded (likely permission error or wrong ID)")
+        
+        logger.info(f"✅ Download complete: {destination}")
+    except Exception as e:
+        logger.error(f"❌ Download failed: {e}")
+        # Clean up partial/corrupt file
+        if os.path.exists(destination):
+            os.remove(destination)
+        raise
 
 # =============================================================================
 # Imports & Configuration
