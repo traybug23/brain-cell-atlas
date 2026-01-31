@@ -1,0 +1,7 @@
+# Brain Cell Atlas Dashboard - Frontend Dependencies
+# Install: pip install -r requirements.txt
+
+streamlit==1.29.0
+requests==2.31.0
+pandas==2.0.3
+plotly==5.18.0

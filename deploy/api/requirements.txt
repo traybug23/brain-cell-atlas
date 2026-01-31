@@ -1,0 +1,14 @@
+# Brain Cell Atlas API - Backend Dependencies
+# Install: pip install -r requirements.txt
+
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+scanpy==1.9.6
+anndata==0.10.3
+scikit-learn==1.4.0
+joblib==1.3.2
+numpy==1.24.3
+pandas==2.0.3
+scipy==1.11.4
+pydantic==2.5.3
+python-multipart==0.0.6
