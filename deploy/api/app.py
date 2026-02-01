@@ -225,7 +225,7 @@ async def lifespan(app: FastAPI):
         # Deployment Trigger: 2026-01-31 20:45
         # Replace these IDs with your actual Google Drive File IDs
         # ------------------------------------------------------------------
-        DATA_FILE_ID = "1f0TJo8XxVDVKBYvj80YEwFo4oBnpfoyp"
+        DATA_FILE_ID = "1ZwSfQ6CMy9nOyn3smIjs4SJggIJOgHdp"
         MODEL_FILE_ID = "1RStpgcZOTAEj8hM8hBWKmjd_kDKLWg8n"
         # ------------------------------------------------------------------
         
