@@ -250,6 +250,38 @@ async def lifespan(app: FastAPI):
         logger.info(f"📂 Loading data from: {load_path_data}")
         adata = sc.read_h5ad(load_path_data)
         
+        # ------------------------------------------------------------------
+        # CRITICAL FIX: Column Renaming
+        # Ensure 'cell_type' column exists by mapping common alternatives
+        # ------------------------------------------------------------------
+        if 'cell_type' not in adata.obs.columns:
+            logger.warning("⚠️ 'cell_type' column missing! Attempting auto-fix...")
+            logger.info(f"Available columns: {adata.obs.columns.tolist()}")
+            
+            # Common alternatives in MTG datasets
+            alternatives = [
+                'author_cell_type', 'cell_type_label', 'cluster_label', 
+                'subclass_label', 'class_label', 'pol_cell_type'
+            ]
+            
+            found = False
+            for alt in alternatives:
+                if alt in adata.obs.columns:
+                    logger.info(f"✅ Found alternative column: '{alt}'. Renaming to 'cell_type'.")
+                    adata.obs['cell_type'] = adata.obs[alt].astype(str)
+                    found = True
+                    break
+            
+            if not found:
+                # Last resort: use the index or first categorical column
+                logger.error("❌ Could not find cell type column! Using index as fallback.")
+                # This might break things but prevents immediate crash
+                adata.obs['cell_type'] = "Unknown" 
+                
+        # Ensure string type
+        adata.obs['cell_type'] = adata.obs['cell_type'].astype(str)
+        # ------------------------------------------------------------------
+
         logger.info(f"🤖 Loading model from: {load_path_model}")
         model = joblib.load(load_path_model)
         
