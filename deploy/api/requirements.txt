@@ -6,11 +6,11 @@ numpy==1.26.4
 scipy==1.14.1
 pandas==2.2.3
 scanpy==1.10.3
-anndata==0.10.9
+anndata>=0.11.0
 scikit-learn==1.5.2
 joblib==1.4.2
 pydantic==2.9.0
 python-multipart==0.0.17
-h5py==3.12.1
+h5py>=3.12.1
 requests>=2.32.0
 gdown>=5.1.0
