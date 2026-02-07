@@ -1,19 +1,4 @@
-"""
-Brain Cell Atlas Dashboard - Streamlit Frontend
-================================================
-Research-grade dashboard for single-cell RNA-seq analysis
-of the Human Middle Temporal Gyrus (MTG) dataset.
 
-Pages:
-- 🗺️ The Atlas: Dataset overview and UMAP visualization
-- 🔬 Gene Inspector: Gene expression analysis
-- 🤖 Model Performance: Classifier metrics and confusion matrix
-- 🗣️ Language Genes: Language disorder gene analysis
-- 📊 Data Quality: QC metrics and filtering summary
-
-CRITICAL: This frontend uses thin-client architecture.
-All data is fetched from the FastAPI backend via REST API.
-"""
 
 import streamlit as st
 import requests
@@ -292,7 +277,7 @@ def api_request(endpoint: str, method: str = "GET", data: dict = None) -> Option
         return response.json()
     
     except requests.exceptions.ConnectionError:
-        st.error("⚠️ **Backend Offline** - The FastAPI server is not running")
+        st.error(" **Backend Offline** - The FastAPI server is not running")
         st.markdown("""
         **Start the backend first:**
         ```bash
@@ -307,11 +292,11 @@ def api_request(endpoint: str, method: str = "GET", data: dict = None) -> Option
             error_detail = e.response.json().get('detail', str(e))
         except:
             error_detail = str(e)
-        st.error(f"⚠️ **API Error:** {error_detail}")
+        st.error(f" **API Error:** {error_detail}")
         return None
     
     except Exception as e:
-        st.error(f"⚠️ **Unexpected Error:** {str(e)}")
+        st.error(f" **Unexpected Error:** {str(e)}")
         return None
 
 
