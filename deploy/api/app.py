@@ -344,6 +344,12 @@ async def root():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/healthz")
+async def healthz():
+    """Simple health check for deployment platforms."""
+    return {"status": "ok"}
+
+
 @app.get("/genes", response_model=GeneListResponse)
 async def get_genes():
     """Return list of all available gene symbols."""
