@@ -25,7 +25,7 @@ Follow these steps to set up and run the application locally. This workflow ensu
 
 git clone <https://github.com/traybug23/brain-cell-atlas>
 
-cd brain-cell-atlas
+cd BrainCellAtlas
 
 ### Step 2: Set up the Backend (API)
 
